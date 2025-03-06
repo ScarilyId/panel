@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Horn Panel</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1f1f1f;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #1f1f1f;
+      padding: 10px;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      padding: 20px;
+    }
+    section {
+      margin-bottom: 30px;
+      border: 1px solid #333;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #1f1f1f;
+    }
+    input, button, textarea {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border: none;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+      background-color: #ff9800;
+      color: #000;
+      font-weight: bold;
+    }
+    footer {
+      background-color: #1f1f1f;
+      padding: 10px;
+      text-align: center;
+      border-top: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dark Horn Panel</h1>
+  </header>
+  <nav>
+    <a href="index.html">Profile</a>
+    <a href="panel.html">Panel</a>
+  </nav>
+  <div class="container">
+    <!-- SECTION: Input Token (Hanya di panel) -->
+    <section id="token-section">
+      <h2>Set GitHub Token</h2>
+      <div id="token-setup">
+        <form id="tokenForm">
+          <label>Masukkan GitHub Token (input manual):</label><br />
+          <input type="text" id="tokenInput" placeholder="Masukkan token disini" required /><br />
+          <button type="submit">Simpan Token</button>
+        </form>
+      </div>
+      <div id="token-saved" style="display:none;">
+        <p>Token telah disimpan.</p>
+        <button onclick="resetToken()">Reset Token</button>
+      </div>
+    </section>
+
+    <!-- PANEL PUBLIK: Upload Foto -->
+    <section id="public-panel">
+      <h2>Panel Publik</h2>
+      <button onclick="authenticatePublic()">Masuk ke Panel Publik (Password Required)</button>
+      <div id="public-content" style="display:none;">
+        <form id="uploadImageForm">
+          <label>Upload Image ke Repo Panel:</label><br />
+          <input type="file" id="imageFile" accept="image/*" required /><br />
+          <button type="submit">Upload Image</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PANEL ADMIN: Upload Logo & Edit Kode -->
+    <section id="admin-panel">
+      <h2>Panel Admin</h2>
+      <button onclick="authenticateAdmin()">Masuk ke Panel Admin (Password Required)</button>
+      <div id="admin-content" style="display:none;">
+        <form id="uploadLogoForm">
+          <label>Upload Logo ke Repo Darkhorn:</label><br />
+          <input type="file" id="logoFile" accept="image/*" required /><br />
+          <button type="submit">Upload Logo</button>
+        </form>
+        <form id="editCodeForm">
+          <label>Edit Kode / Tambah List Member:</label><br />
+          <textarea id="editText" rows="5" placeholder="Masukkan kode atau data member..."></textarea><br />
+          <button type="submit">Simpan Perubahan</button>
+        </form>
+      </div>
+    </section>
+  </div>
+  <footer>
+    <p>&copy; 2025 Dark Horn Panel. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Ambil token dari localStorage (jika sudah tersimpan)
+    let GITHUB_TOKEN = localStorage.getItem("GITHUB_TOKEN") || "";
+
+    function updateTokenDisplay() {
+      if(GITHUB_TOKEN) {
+        document.getElementById("token-setup").style.display = "none";
+        document.getElementById("token-saved").style.display = "block";
+      } else {
+        document.getElementById("token-setup").style.display = "block";
+        document.getElementById("token-saved").style.display = "none";
+      }
+    }
+    updateTokenDisplay();
+
+    // Simpan token ke localStorage
+    document.getElementById("tokenForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const tokenInput = document.getElementById("tokenInput").value.trim();
+      if(tokenInput) {
+        GITHUB_TOKEN = tokenInput;
+        localStorage.setItem("GITHUB_TOKEN", tokenInput);
+        updateTokenDisplay();
+        alert("Token berhasil disimpan!");
+      }
+    });
+    function resetToken() {
+      localStorage.removeItem("GITHUB_TOKEN");
+      GITHUB_TOKEN = "";
+      updateTokenDisplay();
+      alert("Token telah direset.");
+    }
+
+    // === OTENTIKASI PANEL ===
+    function authenticatePublic() {
+      const password = prompt("Masukkan password untuk Panel Publik:");
+      if (password === "darkhorn5512") {
+        document.getElementById("public-content").style.display = "block";
+      } else {
+        alert("Password salah!");
+      }
+    }
+    function authenticateAdmin() {
+      const password = prompt("Masukkan password untuk Panel Admin:");
+      if (password === "dark5555") {
+        document.getElementById("admin-content").style.display = "block";
+      } else {
+        alert("Password salah!");
+      }
+    }
+
+    // === FUNGSI BANTUAN: UPLOAD FILE KE GITHUB ===
+    // Membaca file dan mengubahnya ke base64
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64String = reader.result.split(",")[1];
+          resolve(base64String);
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+    // Fungsi upload file ke GitHub (repositori dan path di-set sesuai kebutuhan)
+    async function uploadFileToGitHub(repo, path, file, commitMessage) {
+      if(!GITHUB_TOKEN) {
+        alert("Token GitHub belum diset!");
+        return;
+      }
+      try {
+        const content = await readFileAsBase64(file);
+        const url = `https://api.github.com/repos/ScarilyId/${repo}/contents/${path}`;
+        
+        // Coba ambil file yang sudah ada untuk mendapatkan SHA (jika ada)
+        let sha = null;
+        let getResponse = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(getResponse.ok) {
+          const getData = await getResponse.json();
+          sha = getData.sha;
+        }
+        
+        const payload = {
+          message: commitMessage,
+          content: content,
+          branch: "main"
+        };
+        if(sha) payload.sha = sha;
+
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.github.v3+json"
+          },
+          body: JSON.stringify(payload)
+        });
+        if(response.ok) {
+          alert("File berhasil diupload ke repo " + repo);
+        } else {
+          alert("Gagal mengupload file ke repo " + repo);
+          console.error(await response.json());
+        }
+      } catch(error) {
+        console.error(error);
+        alert("Error: " + error.message);
+      }
+    }
+
+    // === PANEL PUBLIK: Upload Image ke repo "panel" ===
+    document.getElementById("uploadImageForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById("imageFile");
+      const file = fileInput.files[0];
+      if(file) {
+        const path = "images/" + file.name; // Contoh path di repo panel
+        await uploadFileToGitHub("panel", path, file, "Upload image " + file.name);
+        fileInput.value = "";
+      }
+    });
+
+    // === PANEL ADMIN: Upload Logo ke repo "Darkhorn" ===
+    document.getElementById("uploadLogoForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById("logoFile");
+      const file = fileInput.files[0];
+      if(file) {
+        const path = "logo/" + file.name;
+        await uploadFileToGitHub("Darkhorn", path, file, "Upload logo " + file.name);
+        fileInput.value = "";
+      }
+    });
+    
+    // === PANEL ADMIN: Edit Kode / Tambah List Member (update file member_list.txt di repo "Darkhorn") ===
+    document.getElementById("editCodeForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newData = document.getElementById("editText").value;
+      const path = "member_list.txt";
+      const url = `https://api.github.com/repos/ScarilyId/Darkhorn/contents/${path}`;
+      let sha = null;
+      let existingContent = "";
+      let getResponse = await fetch(url, {
+        headers: {
+          "Authorization": "token " + GITHUB_TOKEN,
+          "Accept": "application/vnd.github.v3+json"
+        }
+      });
+      if(getResponse.ok) {
+        const data = await getResponse.json();
+        sha = data.sha;
+        existingContent = atob(data.content);
+      }
+      const updatedContent = existingContent + "\n" + newData;
+      const payload = {
+        message: "Update member list",
+        content: btoa(updatedContent),
+        branch: "main"
+      };
+      if(sha) payload.sha = sha;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Authorization": "token " + GITHUB_TOKEN,
+          "Content-Type": "application/json",
+          "Accept": "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify(payload)
+      });
+      if(response.ok) {
+        alert("Perubahan berhasil disimpan.");
+        document.getElementById("editText").value = "";
+      } else {
+        alert("Gagal menyimpan perubahan.");
+      }
+    });
+  </script>
+</body>
+  </html>
+      
