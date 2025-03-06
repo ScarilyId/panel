@@ -1,146 +1,117 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dark Horn Panel</title>
   <style>
     body {
-      background-color: #121212;
+      background: #121212;
       color: #fff;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #1f1f1f;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
+    }
+    h1 {
       text-align: center;
-      border-bottom: 1px solid #333;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      background-color: #1f1f1f;
-      padding: 10px;
-    }
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
+      margin-bottom: 20px;
     }
     .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .section {
+      background: #1f1f1f;
       padding: 20px;
-    }
-    section {
-      margin-bottom: 30px;
-      border: 1px solid #333;
-      padding: 15px;
+      margin-bottom: 20px;
       border-radius: 8px;
-      background-color: #1f1f1f;
     }
-    input, button, textarea {
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 4px;
-      border: none;
-    }
-    input[type="text"], textarea {
+    label, input, button, textarea {
+      display: block;
       width: 100%;
+      margin-bottom: 10px;
+    }
+    input, textarea {
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
     }
     button {
-      cursor: pointer;
-      background-color: #ff9800;
-      color: #000;
-      font-weight: bold;
-    }
-    footer {
-      background-color: #1f1f1f;
+      background: #ff9800;
+      border: none;
       padding: 10px;
-      text-align: center;
-      border-top: 1px solid #333;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #e68900;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Dark Horn Panel</h1>
-  </header>
-  <nav>
-    <a href="index.html">Profile</a>
-    <a href="panel.html">Panel</a>
-  </nav>
+  <h1>Dark Horn Panel</h1>
   <div class="container">
-    <!-- SECTION: Input Token (Hanya di panel) -->
-    <section id="token-section">
-      <h2>Set GitHub Token</h2>
-      <div id="token-setup">
-        <form id="tokenForm">
-          <label>Masukkan GitHub Token (input manual):</label><br />
-          <input type="text" id="tokenInput" placeholder="Masukkan token disini" required /><br />
-          <button type="submit">Simpan Token</button>
-        </form>
-      </div>
-      <div id="token-saved" style="display:none;">
-        <p>Token telah disimpan.</p>
-        <button onclick="resetToken()">Reset Token</button>
-      </div>
-    </section>
-
-    <!-- PANEL PUBLIK: Upload Foto -->
-    <section id="public-panel">
-      <h2>Panel Publik</h2>
-      <button onclick="authenticatePublic()">Masuk ke Panel Publik (Password Required)</button>
-      <div id="public-content" style="display:none;">
-        <form id="uploadImageForm">
-          <label>Upload Image ke Repo Panel:</label><br />
-          <input type="file" id="imageFile" accept="image/*" required /><br />
-          <button type="submit">Upload Image</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- PANEL ADMIN: Upload Logo & Edit Kode -->
-    <section id="admin-panel">
-      <h2>Panel Admin</h2>
-      <button onclick="authenticateAdmin()">Masuk ke Panel Admin (Password Required)</button>
-      <div id="admin-content" style="display:none;">
-        <form id="uploadLogoForm">
-          <label>Upload Logo ke Repo Darkhorn:</label><br />
-          <input type="file" id="logoFile" accept="image/*" required /><br />
-          <button type="submit">Upload Logo</button>
-        </form>
-        <form id="editCodeForm">
-          <label>Edit Kode / Tambah List Member:</label><br />
-          <textarea id="editText" rows="5" placeholder="Masukkan kode atau data member..."></textarea><br />
-          <button type="submit">Simpan Perubahan</button>
-        </form>
-      </div>
-    </section>
+    <!-- 1. Token Setup -->
+    <div class="section" id="tokenSection">
+      <h2>Setup GitHub Token</h2>
+      <form id="tokenForm">
+        <label>Masukkan GitHub Token:</label>
+        <input type="text" id="tokenInput" placeholder="Masukkan token disini" required>
+        <button type="submit">Simpan Token</button>
+      </form>
+      <div id="tokenStatus" class="status"></div>
+    </div>
+    
+    <!-- 2. Upload Foto -->
+    <div class="section">
+      <h2>Upload Foto ke Repo Darkhorn</h2>
+      <form id="uploadImageForm">
+        <label>Pilih file image:</label>
+        <input type="file" id="imageFile" accept="image/*" required>
+        <button type="submit">Upload Image</button>
+      </form>
+      <div id="uploadImageStatus" class="status"></div>
+    </div>
+    
+    <!-- 3. Edit Member List -->
+    <div class="section">
+      <h2>Edit Member List (member_list.txt)</h2>
+      <form id="editMemberForm">
+        <label>Masukkan data member baru (teks akan ditambahkan):</label>
+        <textarea id="memberText" rows="4" placeholder="Masukkan data member..."></textarea>
+        <button type="submit">Simpan Perubahan</button>
+      </form>
+      <div id="memberStatus" class="status"></div>
+    </div>
+    
+    <!-- 4. Edit Comments -->
+    <div class="section">
+      <h2>Edit Comments (comments.txt)</h2>
+      <form id="editCommentsForm">
+        <label>Masukkan komentar baru (teks akan ditambahkan):</label>
+        <textarea id="commentsText" rows="4" placeholder="Masukkan komentar..."></textarea>
+        <button type="submit">Simpan Perubahan</button>
+      </form>
+      <div id="commentsStatus" class="status"></div>
+    </div>
   </div>
-  <footer>
-    <p>&copy; 2025 Dark Horn Panel. All rights reserved.</p>
-  </footer>
-
+  
   <script>
-    // Ambil token dari localStorage (jika sudah tersimpan)
+    // Global Variabel
     let GITHUB_TOKEN = localStorage.getItem("GITHUB_TOKEN") || "";
-
-    function updateTokenDisplay() {
-      if(GITHUB_TOKEN) {
-        document.getElementById("token-setup").style.display = "none";
-        document.getElementById("token-saved").style.display = "block";
-      } else {
-        document.getElementById("token-setup").style.display = "block";
-        document.getElementById("token-saved").style.display = "none";
-      }
+    const OWNER = "ScarilyId";
+    const REPO = "Darkhorn";  // Semua operasi di repo "Darkhorn"
+    
+    const tokenStatus = document.getElementById("tokenStatus");
+    function updateTokenStatus() {
+      tokenStatus.textContent = GITHUB_TOKEN ? "Token tersimpan." : "Token belum diset.";
     }
-    updateTokenDisplay();
-
+    updateTokenStatus();
+    
     // Simpan token ke localStorage
     document.getElementById("tokenForm").addEventListener("submit", function(e) {
       e.preventDefault();
@@ -148,37 +119,12 @@
       if(tokenInput) {
         GITHUB_TOKEN = tokenInput;
         localStorage.setItem("GITHUB_TOKEN", tokenInput);
-        updateTokenDisplay();
+        updateTokenStatus();
         alert("Token berhasil disimpan!");
       }
     });
-    function resetToken() {
-      localStorage.removeItem("GITHUB_TOKEN");
-      GITHUB_TOKEN = "";
-      updateTokenDisplay();
-      alert("Token telah direset.");
-    }
-
-    // === OTENTIKASI PANEL ===
-    function authenticatePublic() {
-      const password = prompt("Masukkan password untuk Panel Publik:");
-      if (password === "darkhorn5512") {
-        document.getElementById("public-content").style.display = "block";
-      } else {
-        alert("Password salah!");
-      }
-    }
-    function authenticateAdmin() {
-      const password = prompt("Masukkan password untuk Panel Admin:");
-      if (password === "dark5555") {
-        document.getElementById("admin-content").style.display = "block";
-      } else {
-        alert("Password salah!");
-      }
-    }
-
-    // === FUNGSI BANTUAN: UPLOAD FILE KE GITHUB ===
-    // Membaca file dan mengubahnya ke base64
+    
+    // Fungsi bantu: Membaca file dan mengubah ke Base64
     function readFileAsBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -190,17 +136,16 @@
         reader.readAsDataURL(file);
       });
     }
-    // Fungsi upload file ke GitHub (repositori dan path di-set sesuai kebutuhan)
+    
+    // Fungsi bantu: Upload file ke GitHub
     async function uploadFileToGitHub(repo, path, file, commitMessage) {
       if(!GITHUB_TOKEN) {
         alert("Token GitHub belum diset!");
-        return;
+        return false;
       }
       try {
         const content = await readFileAsBase64(file);
-        const url = `https://api.github.com/repos/ScarilyId/${repo}/contents/${path}`;
-        
-        // Coba ambil file yang sudah ada untuk mendapatkan SHA (jika ada)
+        const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${path}`;
         let sha = null;
         let getResponse = await fetch(url, {
           headers: {
@@ -212,14 +157,12 @@
           const getData = await getResponse.json();
           sha = getData.sha;
         }
-        
         const payload = {
           message: commitMessage,
           content: content,
           branch: "main"
         };
         if(sha) payload.sha = sha;
-
         const response = await fetch(url, {
           method: "PUT",
           headers: {
@@ -230,84 +173,109 @@
           body: JSON.stringify(payload)
         });
         if(response.ok) {
-          alert("File berhasil diupload ke repo " + repo);
+          return true;
         } else {
-          alert("Gagal mengupload file ke repo " + repo);
           console.error(await response.json());
+          return false;
         }
       } catch(error) {
         console.error(error);
-        alert("Error: " + error.message);
+        return false;
       }
     }
-
-    // === PANEL PUBLIK: Upload Image ke repo "panel" ===
+    
+    // 2. Upload Image (foto) ke repo Darkhorn di folder "images/"
     document.getElementById("uploadImageForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const fileInput = document.getElementById("imageFile");
       const file = fileInput.files[0];
+      const statusDiv = document.getElementById("uploadImageStatus");
       if(file) {
-        const path = "images/" + file.name; // Contoh path di repo panel
-        await uploadFileToGitHub("panel", path, file, "Upload image " + file.name);
-        fileInput.value = "";
-      }
-    });
-
-    // === PANEL ADMIN: Upload Logo ke repo "Darkhorn" ===
-    document.getElementById("uploadLogoForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById("logoFile");
-      const file = fileInput.files[0];
-      if(file) {
-        const path = "logo/" + file.name;
-        await uploadFileToGitHub("Darkhorn", path, file, "Upload logo " + file.name);
+        statusDiv.textContent = "Uploading image...";
+        const path = "images/" + file.name;
+        const success = await uploadFileToGitHub(REPO, path, file, "Upload image " + file.name);
+        statusDiv.textContent = success ? "Image berhasil diupload." : "Gagal upload image.";
         fileInput.value = "";
       }
     });
     
-    // === PANEL ADMIN: Edit Kode / Tambah List Member (update file member_list.txt di repo "Darkhorn") ===
-    document.getElementById("editCodeForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newData = document.getElementById("editText").value;
-      const path = "member_list.txt";
-      const url = `https://api.github.com/repos/ScarilyId/Darkhorn/contents/${path}`;
+    // Fungsi untuk mengupdate file teks di GitHub (untuk member_list.txt dan comments.txt)
+    async function updateTextFile(filePath, newText, statusElement) {
+      if(!GITHUB_TOKEN) {
+        statusElement.textContent = "Token GitHub belum diset!";
+        return;
+      }
+      const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`;
       let sha = null;
       let existingContent = "";
-      let getResponse = await fetch(url, {
-        headers: {
-          "Authorization": "token " + GITHUB_TOKEN,
-          "Accept": "application/vnd.github.v3+json"
+      statusElement.textContent = "Mengambil konten file...";
+      try {
+        let getResponse = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(getResponse.ok) {
+          const data = await getResponse.json();
+          sha = data.sha;
+          existingContent = atob(data.content);
         }
-      });
-      if(getResponse.ok) {
-        const data = await getResponse.json();
-        sha = data.sha;
-        existingContent = atob(data.content);
+        // Menggabungkan teks baru dengan konten yang sudah ada (atau bisa disesuaikan logikanya)
+        const updatedContent = existingContent + "\n" + newText;
+        const payload = {
+          message: "Update " + filePath,
+          content: btoa(updatedContent),
+          branch: "main"
+        };
+        if(sha) payload.sha = sha;
+        statusElement.textContent = "Mengupdate file...";
+        const response = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Content-Type": "application/json",
+            "Accept": "application/vnd.github.v3+json"
+          },
+          body: JSON.stringify(payload)
+        });
+        if(response.ok) {
+          statusElement.textContent = filePath + " berhasil diperbarui.";
+        } else {
+          statusElement.textContent = "Gagal memperbarui " + filePath;
+          console.error(await response.json());
+        }
+      } catch (error) {
+        console.error(error);
+        statusElement.textContent = "Error: " + error.message;
       }
-      const updatedContent = existingContent + "\n" + newData;
-      const payload = {
-        message: "Update member list",
-        content: btoa(updatedContent),
-        branch: "main"
-      };
-      if(sha) payload.sha = sha;
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Authorization": "token " + GITHUB_TOKEN,
-          "Content-Type": "application/json",
-          "Accept": "application/vnd.github.v3+json"
-        },
-        body: JSON.stringify(payload)
-      });
-      if(response.ok) {
-        alert("Perubahan berhasil disimpan.");
-        document.getElementById("editText").value = "";
-      } else {
-        alert("Gagal menyimpan perubahan.");
+    }
+    
+    // 3. Edit Member List (member_list.txt)
+    document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newData = document.getElementById("memberText").value;
+      const statusDiv = document.getElementById("memberStatus");
+      if(newData.trim() === "") {
+        statusDiv.textContent = "Teks tidak boleh kosong.";
+        return;
       }
+      await updateTextFile("member_list.txt", newData, statusDiv);
+      document.getElementById("memberText").value = "";
+    });
+    
+    // 4. Edit Comments (comments.txt)
+    document.getElementById("editCommentsForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newData = document.getElementById("commentsText").value;
+      const statusDiv = document.getElementById("commentsStatus");
+      if(newData.trim() === "") {
+        statusDiv.textContent = "Teks tidak boleh kosong.";
+        return;
+      }
+      await updateTextFile("comments.txt", newData, statusDiv);
+      document.getElementById("commentsText").value = "";
     });
   </script>
 </body>
-  </html>
-      
+</html>
