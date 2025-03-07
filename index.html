@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dark Horn Panel</title>
+  <title>Dark Horn Admin Panel</title>
   <style>
     body {
       background: #121212;
@@ -12,26 +12,20 @@
       padding: 20px;
       margin: 0;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
     .section {
       background: #1f1f1f;
-      padding: 20px;
+      padding: 15px;
       margin-bottom: 20px;
       border-radius: 8px;
     }
-    label, input, button, textarea {
+    label, input, button, textarea, select {
       display: block;
       width: 100%;
       margin-bottom: 10px;
     }
-    input, textarea {
+    input, textarea, select {
       padding: 8px;
       border: none;
       border-radius: 4px;
@@ -45,126 +39,86 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    button:hover {
-      background: #e68900;
-    }
-    .status {
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
+    button:hover { background: #e68900; }
+    .status { margin-top: 10px; font-size: 0.9rem; }
+    .file-item { padding: 5px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .file-item button { width: auto; padding: 5px 10px; font-size: 0.8rem; }
   </style>
 </head>
 <body>
-  <h1>Dark Horn Panel</h1>
+  <h1>Dark Horn Admin Panel</h1>
   <div class="container">
-    <!-- 1. Setup Token -->
+    <!-- Section 1: Setup Token -->
     <div class="section" id="tokenSection">
       <h2>Setup GitHub Token</h2>
       <form id="tokenForm">
         <label>Masukkan GitHub Token:</label>
-        <input type="text" id="tokenInput" placeholder="Masukkan token disini" required>
+        <input type="text" id="tokenInput" placeholder="Masukkan token di sini" required>
         <button type="submit">Simpan Token</button>
       </form>
       <div id="tokenStatus" class="status"></div>
     </div>
-    
-    <!-- 2. Upload Logo (Header Profile) -->
-    <div class="section">
-      <h2>Upload Logo (Header Profile)</h2>
-      <form id="uploadLogoForm">
-        <label>Pilih file logo (akan disimpan sebagai logo/logo.png):</label>
-        <input type="file" id="logoFile" accept="image/*" required>
-        <button type="submit">Upload Logo</button>
-      </form>
-      <div id="uploadLogoStatus" class="status"></div>
+
+    <!-- Section 2: Upload File -->
+    <div class="section" id="uploadSection">
+      <h2>Upload File</h2>
+      <!-- Upload Logo -->
+      <label>Upload Logo (disimpan sebagai logo/logo.png):</label>
+      <input type="file" id="logoFile" accept="image/*">
+      <button onclick="uploadFile('logo/logo.png', document.getElementById('logoFile').files[0], 'Upload logo')">Upload Logo</button>
+      <!-- Upload Banner -->
+      <label>Upload Banner (disimpan sebagai banner/banner.png):</label>
+      <input type="file" id="bannerFile" accept="image/*">
+      <button onclick="uploadFile('banner/banner.png', document.getElementById('bannerFile').files[0], 'Upload banner')">Upload Banner</button>
+      <!-- Upload Background -->
+      <label>Upload Background (disimpan sebagai background/background.png):</label>
+      <input type="file" id="backgroundFile" accept="image/*">
+      <button onclick="uploadFile('background/background.png', document.getElementById('backgroundFile').files[0], 'Upload background')">Upload Background</button>
+      <!-- Upload Media -->
+      <label>Upload Media (disimpan ke folder images):</label>
+      <input type="file" id="mediaFile" accept="image/*,video/*">
+      <button onclick="uploadFile('images/' + document.getElementById('mediaFile').files[0].name, document.getElementById('mediaFile').files[0], 'Upload media')">Upload Media</button>
+      <!-- Upload Skin -->
+      <label>Upload Minecraft Skin:</label>
+      <input type="file" id="skinFile" accept="image/*">
+      <label>Nama Player:</label>
+      <input type="text" id="skinPlayer" placeholder="Masukkan nama player">
+      <button onclick="uploadSkin()">Upload Skin</button>
+      <div id="uploadStatus" class="status"></div>
     </div>
-    
-    <!-- 3. Upload Banner -->
-    <div class="section">
-      <h2>Upload Banner</h2>
-      <form id="uploadBannerForm">
-        <label>Pilih file banner (akan disimpan sebagai banner/banner.png):</label>
-        <input type="file" id="bannerFile" accept="image/*" required>
-        <button type="submit">Upload Banner</button>
-      </form>
-      <div id="uploadBannerStatus" class="status"></div>
+
+    <!-- Section 3: Edit File (bisa pilih file yang akan diedit) -->
+    <div class="section" id="editSection">
+      <h2>Edit File</h2>
+      <label for="fileSelect">Pilih file:</label>
+      <select id="fileSelect">
+        <option value="index.html">index.html</option>
+        <option value="member_list.txt">member_list.txt</option>
+        <option value="video_links.txt">video_links.txt</option>
+        <option value="recruitment.txt">recruitment.txt</option>
+        <option value="skins_list.txt">skins_list.txt</option>
+      </select>
+      <button onclick="loadFileContent()">Load File</button>
+      <textarea id="fileContent" rows="10" style="width:100%;">Content akan muncul di sini...</textarea>
+      <button onclick="saveFileContent()">Save Changes</button>
+      <button onclick="deleteSelectedFile()">Delete File</button>
+      <div id="editStatus" class="status"></div>
     </div>
-    
-    <!-- 4. Upload Background -->
-    <div class="section">
-      <h2>Upload Background</h2>
-      <form id="uploadBackgroundForm">
-        <label>Pilih file background (akan disimpan sebagai background/background.png):</label>
-        <input type="file" id="backgroundFile" accept="image/*" required>
-        <button type="submit">Upload Background</button>
-      </form>
-      <div id="uploadBackgroundStatus" class="status"></div>
-    </div>
-    
-    <!-- 5. Upload Media (Foto/Video) ke folder images/ -->
-    <div class="section">
-      <h2>Upload Media (Foto/Video)</h2>
-      <form id="uploadMediaForm">
-        <label>Pilih file (foto/video):</label>
-        <input type="file" id="mediaFile" accept="image/*,video/*" required>
-        <button type="submit">Upload Media</button>
-      </form>
-      <div id="uploadMediaStatus" class="status"></div>
-    </div>
-    
-    <!-- 6. Edit Member List (member_list.txt) -->
-    <div class="section">
-      <h2>Edit Member List</h2>
-      <form id="editMemberForm">
-        <label>Tambahkan data member (teks akan ditambahkan ke file):</label>
-        <textarea id="memberText" rows="4" placeholder="Masukkan data member..."></textarea>
-        <button type="submit">Simpan Perubahan</button>
-      </form>
-      <div id="memberStatus" class="status"></div>
-    </div>
-    
-    <!-- 7. Edit Video Links (video_links.txt) -->
-    <div class="section">
-      <h2>Edit Video Links</h2>
-      <form id="editVideoForm">
-        <label>Masukkan link video baru (satu per baris):</label>
-        <textarea id="videoText" rows="4" placeholder="Masukkan link video..."></textarea>
-        <button type="submit">Simpan Perubahan</button>
-      </form>
-      <div id="videoStatus" class="status"></div>
-    </div>
-    
-    <!-- 8. Edit Recruitment Link (recruitment.txt) -->
-    <div class="section">
-      <h2>Set Recruitment Link</h2>
-      <form id="editRecruitmentForm">
-        <label>Masukkan URL recruitment:</label>
-        <input type="text" id="recruitmentInput" placeholder="Masukkan URL recruitment">
-        <button type="submit">Simpan Perubahan</button>
-      </form>
-      <div id="recruitmentStatus" class="status"></div>
-    </div>
-    
-    <!-- 9. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt) -->
-    <div class="section">
-      <h2>Upload Minecraft Skin & Update Skin Mapping</h2>
-      <form id="uploadSkinForm">
-        <label>Pilih file skin Minecraft:</label>
-        <input type="file" id="skinFile" accept="image/*" required>
-        <label>Nama Player:</label>
-        <input type="text" id="skinPlayer" placeholder="Masukkan nama player" required>
-        <button type="submit">Upload Skin</button>
-      </form>
-      <div id="skinStatus" class="status"></div>
+
+    <!-- Section 4: List Files (opsional) -->
+    <div class="section" id="listFilesSection">
+      <h2>Daftar File di Repository</h2>
+      <div id="fileList">Memuat daftar file...</div>
+      <button onclick="listRepositoryFiles()">Refresh List</button>
     </div>
   </div>
   
   <script>
-    // Global variabel
-    let GITHUB_TOKEN = localStorage.getItem("GITHUB_TOKEN") || "";
     const OWNER = "ScarilyId";
     const REPO = "Darkhorn";
+    let GITHUB_TOKEN = localStorage.getItem("GITHUB_TOKEN") || "";
     
+    // Update status token
     const tokenStatus = document.getElementById("tokenStatus");
     function updateTokenStatus() {
       tokenStatus.textContent = GITHUB_TOKEN ? "Token tersimpan." : "Token belum diset.";
@@ -183,7 +137,7 @@
       }
     });
     
-    // Fungsi bantu: baca file sebagai Base64
+    // Fungsi untuk membaca file sebagai Base64
     function readFileAsBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -193,25 +147,25 @@
       });
     }
     
-    // Fungsi bantu: upload file ke GitHub
-    async function uploadFileToGitHub(repo, path, file, commitMessage) {
-      if(!GITHUB_TOKEN) {
-        alert("Token GitHub belum diset!");
-        return false;
-      }
+    // Fungsi upload file ke GitHub
+    async function uploadFile(path, file, commitMessage) {
+      if (!GITHUB_TOKEN) { alert("Token belum diset!"); return; }
+      if (!file) { alert("File tidak ditemukan."); return; }
+      document.getElementById("uploadStatus").textContent = commitMessage + " sedang diupload...";
       try {
         const content = await readFileAsBase64(file);
-        const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${path}`;
+        const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`;
         let sha = null;
-        const getResponse = await fetch(url, {
+        // Coba dapatkan file yang ada (untuk update)
+        const getRes = await fetch(url, {
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
             "Accept": "application/vnd.github.v3+json"
           }
         });
-        if(getResponse.ok) {
-          const getData = await getResponse.json();
-          sha = getData.sha;
+        if(getRes.ok) {
+          const data = await getRes.json();
+          sha = data.sha;
         }
         const payload = {
           message: commitMessage,
@@ -219,7 +173,7 @@
           branch: "main"
         };
         if(sha) payload.sha = sha;
-        const response = await fetch(url, {
+        const res = await fetch(url, {
           method: "PUT",
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
@@ -228,166 +182,64 @@
           },
           body: JSON.stringify(payload)
         });
-        if(response.ok) {
-          return true;
+        if(res.ok) {
+          document.getElementById("uploadStatus").textContent = commitMessage + " berhasil.";
         } else {
-          console.error(await response.json());
-          return false;
+          document.getElementById("uploadStatus").textContent = commitMessage + " gagal.";
+          console.error(await res.json());
         }
-      } catch(error) {
+      } catch (error) {
         console.error(error);
-        return false;
+        document.getElementById("uploadStatus").textContent = "Error: " + error.message;
       }
     }
     
-    // 2. Upload Logo (disimpan sebagai logo/logo.png)
-    document.getElementById("uploadLogoForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const file = document.getElementById("logoFile").files[0];
-      const statusDiv = document.getElementById("uploadLogoStatus");
-      if(file) {
-        statusDiv.textContent = "Uploading logo...";
-        const path = "logo/logo.png";
-        const success = await uploadFileToGitHub(REPO, path, file, "Upload logo " + file.name);
-        statusDiv.textContent = success ? "Logo berhasil diupload." : "Gagal upload logo.";
-        document.getElementById("logoFile").value = "";
-      }
-    });
-    
-    // 3. Upload Banner (disimpan sebagai banner/banner.png)
-    document.getElementById("uploadBannerForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const file = document.getElementById("bannerFile").files[0];
-      const statusDiv = document.getElementById("uploadBannerStatus");
-      if(file) {
-        statusDiv.textContent = "Uploading banner...";
-        const path = "banner/banner.png";
-        const success = await uploadFileToGitHub(REPO, path, file, "Upload banner " + file.name);
-        statusDiv.textContent = success ? "Banner berhasil diupload." : "Gagal upload banner.";
-        document.getElementById("bannerFile").value = "";
-      }
-    });
-    
-    // 4. Upload Background (disimpan sebagai background/background.png)
-    document.getElementById("uploadBackgroundForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const file = document.getElementById("backgroundFile").files[0];
-      const statusDiv = document.getElementById("uploadBackgroundStatus");
-      if(file) {
-        statusDiv.textContent = "Uploading background...";
-        const path = "background/background.png";
-        const success = await uploadFileToGitHub(REPO, path, file, "Upload background " + file.name);
-        statusDiv.textContent = success ? "Background berhasil diupload." : "Gagal upload background.";
-        document.getElementById("backgroundFile").value = "";
-      }
-    });
-    
-    // 5. Upload Media (Foto/Video) ke folder images/
-    document.getElementById("uploadMediaForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const file = document.getElementById("mediaFile").files[0];
-      const statusDiv = document.getElementById("uploadMediaStatus");
-      if(file) {
-        statusDiv.textContent = "Uploading media...";
-        const path = "images/" + file.name;
-        const success = await uploadFileToGitHub(REPO, path, file, "Upload media " + file.name);
-        statusDiv.textContent = success ? "Media berhasil diupload." : "Gagal upload media.";
-        document.getElementById("mediaFile").value = "";
-      }
-    });
-    
-    // 6. Edit Member List (member_list.txt)
-    document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newText = document.getElementById("memberText").value;
-      const statusDiv = document.getElementById("memberStatus");
-      if(newText.trim() === "") {
-        statusDiv.textContent = "Teks tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("member_list.txt", newText, statusDiv);
-      document.getElementById("memberText").value = "";
-    });
-    
-    // 7. Edit Video Links (video_links.txt)
-    document.getElementById("editVideoForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newText = document.getElementById("videoText").value;
-      const statusDiv = document.getElementById("videoStatus");
-      if(newText.trim() === "") {
-        statusDiv.textContent = "Teks tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("video_links.txt", newText, statusDiv);
-      document.getElementById("videoText").value = "";
-    });
-    
-    // 8. Edit Recruitment Link (recruitment.txt)
-    document.getElementById("editRecruitmentForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newLink = document.getElementById("recruitmentInput").value;
-      const statusDiv = document.getElementById("recruitmentStatus");
-      if(newLink.trim() === "") {
-        statusDiv.textContent = "Link tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("recruitment.txt", newLink, statusDiv);
-      document.getElementById("recruitmentInput").value = "";
-    });
-    
-    // 9. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt)
-    document.getElementById("uploadSkinForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+    // Fungsi upload skin: upload file skin dan update mapping di skins_list.txt
+    async function uploadSkin() {
       const file = document.getElementById("skinFile").files[0];
-      const playerName = document.getElementById("skinPlayer").value.trim();
-      const statusDiv = document.getElementById("skinStatus");
-      if(!file || playerName === "") {
-        statusDiv.textContent = "File dan nama player harus diisi.";
+      const player = document.getElementById("skinPlayer").value.trim();
+      if(!file || !player) {
+        alert("File dan nama player harus diisi.");
         return;
       }
-      statusDiv.textContent = "Uploading skin...";
-      const path = "skins/" + playerName + "_" + file.name;
-      const success = await uploadFileToGitHub(REPO, path, file, "Upload skin " + file.name);
+      document.getElementById("uploadStatus").textContent = "Uploading skin...";
+      const skinPath = "skins/" + player + "_" + file.name;
+      const success = await uploadFile(skinPath, file, "Upload skin " + file.name);
       if(success) {
-        await updateTextFile("skins_list.txt", `${playerName}:${path}`, statusDiv);
-      } else {
-        statusDiv.textContent = "Gagal upload skin.";
+        // Update skins_list.txt dengan format "player:skinPath"
+        await updateFile("skins_list.txt", player + ":" + skinPath, "Update skins mapping for " + player, false);
       }
       document.getElementById("skinFile").value = "";
       document.getElementById("skinPlayer").value = "";
-    });
+    }
     
     // Fungsi untuk update file teks di GitHub
-    async function updateTextFile(filePath, newText, statusElement) {
-      if(!GITHUB_TOKEN) {
-        statusElement.textContent = "Token GitHub belum diset!";
-        return;
-      }
+    // Jika replace=true, maka konten lama akan diganti; jika false, maka konten baru akan ditambahkan di akhir.
+    async function updateFile(filePath, newText, commitMessage, replace = true) {
+      if (!GITHUB_TOKEN) { alert("Token belum diset!"); return; }
       const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`;
-      let sha = null;
-      let existingContent = "";
-      statusElement.textContent = "Mengambil konten file...";
       try {
-        const getResponse = await fetch(url, {
+        const res = await fetch(url, {
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
             "Accept": "application/vnd.github.v3+json"
           }
         });
-        if(getResponse.ok) {
-          const data = await getResponse.json();
+        let sha = null;
+        let content = "";
+        if (res.ok) {
+          const data = await res.json();
           sha = data.sha;
-          existingContent = atob(data.content);
+          content = atob(data.content);
         }
-        const updatedContent = existingContent + "\n" + newText;
+        let updatedContent = replace ? newText : content + "\n" + newText;
         const payload = {
-          message: "Update " + filePath,
+          message: commitMessage,
           content: btoa(updatedContent),
           branch: "main"
         };
         if(sha) payload.sha = sha;
-        statusElement.textContent = "Mengupdate file...";
-        const response = await fetch(url, {
+        const putRes = await fetch(url, {
           method: "PUT",
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
@@ -396,17 +248,175 @@
           },
           body: JSON.stringify(payload)
         });
-        if(response.ok) {
-          statusElement.textContent = filePath + " berhasil diperbarui.";
+        if(putRes.ok) {
+          document.getElementById("editStatus").textContent = filePath + " berhasil diperbarui.";
         } else {
-          statusElement.textContent = "Gagal memperbarui " + filePath;
-          console.error(await response.json());
+          document.getElementById("editStatus").textContent = "Gagal memperbarui " + filePath;
+          console.error(await putRes.json());
         }
       } catch (error) {
         console.error(error);
-        statusElement.textContent = "Error: " + error.message;
+        document.getElementById("editStatus").textContent = "Error: " + error.message;
       }
     }
+    
+    // Fungsi untuk memuat konten file yang dipilih di editor
+    async function loadFileContent() {
+      const fileSelect = document.getElementById("fileSelect");
+      const filePath = fileSelect.value;
+      if (!GITHUB_TOKEN) { alert("Token belum diset!"); return; }
+      const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`;
+      document.getElementById("editStatus").textContent = "Memuat file...";
+      try {
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(res.ok) {
+          const data = await res.json();
+          const content = atob(data.content);
+          document.getElementById("fileContent").value = content;
+          document.getElementById("editStatus").textContent = "File dimuat.";
+        } else {
+          document.getElementById("editStatus").textContent = "Gagal memuat file.";
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById("editStatus").textContent = "Error: " + error.message;
+      }
+    }
+    
+    // Fungsi untuk menyimpan perubahan pada file yang sedang diedit
+    async function saveFileContent() {
+      const fileSelect = document.getElementById("fileSelect");
+      const filePath = fileSelect.value;
+      const newContent = document.getElementById("fileContent").value;
+      await updateFile(filePath, newContent, "Update " + filePath, true);
+    }
+    
+    // Fungsi untuk menghapus file di repository
+    async function deleteSelectedFile() {
+      const fileSelect = document.getElementById("fileSelect");
+      const filePath = fileSelect.value;
+      if(!confirm("Apakah Anda yakin ingin menghapus " + filePath + "?")) return;
+      if (!GITHUB_TOKEN) { alert("Token belum diset!"); return; }
+      const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`;
+      try {
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(res.ok) {
+          const data = await res.json();
+          const sha = data.sha;
+          const payload = {
+            message: "Delete " + filePath,
+            sha: sha,
+            branch: "main"
+          };
+          const delRes = await fetch(url, {
+            method: "DELETE",
+            headers: {
+              "Authorization": "token " + GITHUB_TOKEN,
+              "Content-Type": "application/json",
+              "Accept": "application/vnd.github.v3+json"
+            },
+            body: JSON.stringify(payload)
+          });
+          if(delRes.ok) {
+            document.getElementById("editStatus").textContent = filePath + " berhasil dihapus.";
+          } else {
+            document.getElementById("editStatus").textContent = "Gagal menghapus " + filePath;
+            console.error(await delRes.json());
+          }
+        } else {
+          document.getElementById("editStatus").textContent = "Gagal mengambil info file.";
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById("editStatus").textContent = "Error: " + error.message;
+      }
+    }
+    
+    // Fungsi untuk mengambil daftar file di repo (opsional)
+    async function listRepositoryFiles() {
+      const fileListDiv = document.getElementById("fileList");
+      fileListDiv.innerHTML = "Memuat file...";
+      try {
+        const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(res.ok) {
+          const files = await res.json();
+          let listHtml = "";
+          files.forEach(file => {
+            listHtml += `<div class="file-item"><span>${file.name}</span> <button onclick="deleteFile('${file.path}')">Delete</button></div>`;
+          });
+          fileListDiv.innerHTML = listHtml;
+        } else {
+          fileListDiv.innerHTML = "Gagal memuat file.";
+        }
+      } catch (error) {
+        console.error(error);
+        fileListDiv.innerHTML = "Error: " + error.message;
+      }
+    }
+    
+    // Fungsi untuk menghapus file melalui daftar (sama seperti deleteSelectedFile)
+    async function deleteFile(filePath) {
+      if(!confirm("Hapus file " + filePath + "?")) return;
+      if (!GITHUB_TOKEN) { alert("Token belum diset!"); return; }
+      const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`;
+      try {
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": "token " + GITHUB_TOKEN,
+            "Accept": "application/vnd.github.v3+json"
+          }
+        });
+        if(res.ok) {
+          const data = await res.json();
+          const sha = data.sha;
+          const payload = {
+            message: "Delete " + filePath,
+            sha: sha,
+            branch: "main"
+          };
+          const delRes = await fetch(url, {
+            method: "DELETE",
+            headers: {
+              "Authorization": "token " + GITHUB_TOKEN,
+              "Content-Type": "application/json",
+              "Accept": "application/vnd.github.v3+json"
+            },
+            body: JSON.stringify(payload)
+          });
+          if(delRes.ok) {
+            alert(filePath + " berhasil dihapus.");
+            listRepositoryFiles();
+          } else {
+            alert("Gagal menghapus " + filePath);
+            console.error(await delRes.json());
+          }
+        } else {
+          alert("Gagal mengambil info file " + filePath);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+      }
+    }
+    
+    // Panggil fungsi daftar file saat panel dimuat
+    listRepositoryFiles();
   </script>
 </body>
 </html>
