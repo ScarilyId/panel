@@ -49,7 +49,7 @@
 <body>
   <h1>Dark Horn Admin Panel</h1>
   <div class="container">
-    <!-- Section 1: Setup Token -->
+    <!-- Setup Token -->
     <div class="section" id="tokenSection">
       <h2>Setup GitHub Token</h2>
       <form id="tokenForm">
@@ -59,27 +59,21 @@
       </form>
       <div id="tokenStatus" class="status"></div>
     </div>
-
-    <!-- Section 2: Upload File -->
+    <!-- Upload File Section -->
     <div class="section" id="uploadSection">
       <h2>Upload File</h2>
-      <!-- Upload Logo -->
       <label>Upload Logo (disimpan sebagai logo/logo.png):</label>
       <input type="file" id="logoFile" accept="image/*">
       <button onclick="uploadFile('logo/logo.png', document.getElementById('logoFile').files[0], 'Upload logo')">Upload Logo</button>
-      <!-- Upload Banner -->
       <label>Upload Banner (disimpan sebagai banner/banner.png):</label>
       <input type="file" id="bannerFile" accept="image/*">
       <button onclick="uploadFile('banner/banner.png', document.getElementById('bannerFile').files[0], 'Upload banner')">Upload Banner</button>
-      <!-- Upload Background -->
       <label>Upload Background (disimpan sebagai background/background.png):</label>
       <input type="file" id="backgroundFile" accept="image/*">
       <button onclick="uploadFile('background/background.png', document.getElementById('backgroundFile').files[0], 'Upload background')">Upload Background</button>
-      <!-- Upload Media -->
       <label>Upload Media (disimpan ke folder images):</label>
       <input type="file" id="mediaFile" accept="image/*,video/*">
       <button onclick="uploadFile('images/' + document.getElementById('mediaFile').files[0].name, document.getElementById('mediaFile').files[0], 'Upload media')">Upload Media</button>
-      <!-- Upload Skin -->
       <label>Upload Minecraft Skin:</label>
       <input type="file" id="skinFile" accept="image/*">
       <label>Nama Player:</label>
@@ -87,8 +81,7 @@
       <button onclick="uploadSkin()">Upload Skin</button>
       <div id="uploadStatus" class="status"></div>
     </div>
-
-    <!-- Section 3: Edit File dengan Undo/Redo & Backup -->
+    <!-- Edit File Section -->
     <div class="section" id="editSection">
       <h2>Edit File</h2>
       <label for="fileSelect">Pilih file:</label>
@@ -98,6 +91,7 @@
         <option value="video_links.txt">video_links.txt</option>
         <option value="recruitment.txt">recruitment.txt</option>
         <option value="skins_list.txt">skins_list.txt</option>
+        <option value="skinViewer.html">skinViewer.html</option>
       </select>
       <button onclick="loadFileContent()">Load File</button>
       <div class="editor-buttons">
@@ -110,15 +104,13 @@
       <button onclick="deleteSelectedFile()">Delete File</button>
       <div id="editStatus" class="status"></div>
     </div>
-
-    <!-- Section 4: List Files -->
+    <!-- List Files Section -->
     <div class="section" id="listFilesSection">
       <h2>Daftar File di Repository</h2>
       <div id="fileList">Memuat daftar file...</div>
       <button onclick="listRepositoryFiles()">Refresh List</button>
     </div>
   </div>
-  
   <script>
     const OWNER = "ScarilyId";
     const REPO = "Darkhorn";
@@ -296,7 +288,7 @@
       }
     }
     
-    // Fungsi backup file (simpan salinan dengan nama backup_timestamp.txt)
+    // Backup file: simpan salinan dengan nama backup_timestamp.txt
     async function backupFile() {
       const fileSelect = document.getElementById("fileSelect");
       const filePath = fileSelect.value;
@@ -460,7 +452,7 @@
       }
     }
     
-    // Panggil fungsi untuk memuat data saat panel dimuat
+    // Panggil fungsi daftar file saat panel dimuat
     listRepositoryFiles();
   </script>
 </body>
