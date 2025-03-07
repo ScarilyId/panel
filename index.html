@@ -10,9 +10,16 @@
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       padding: 20px;
+      margin: 0;
     }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .container { max-width: 900px; margin: 0 auto; }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
     .section {
       background: #1f1f1f;
       padding: 20px;
@@ -36,15 +43,21 @@
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
-    button:hover { background: #e68900; }
-    .status { margin-top: 10px; font-size: 0.9rem; }
+    button:hover {
+      background: #e68900;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
   <h1>Dark Horn Panel</h1>
   <div class="container">
-    <!-- 1. Token Setup -->
+    <!-- 1. Setup Token -->
     <div class="section" id="tokenSection">
       <h2>Setup GitHub Token</h2>
       <form id="tokenForm">
@@ -55,20 +68,20 @@
       <div id="tokenStatus" class="status"></div>
     </div>
     
-    <!-- 2. Upload Logo -->
+    <!-- 2. Upload Logo (Header Profile) -->
     <div class="section">
-      <h2>Upload Logo (untuk Header Profile)</h2>
+      <h2>Upload Logo (Header Profile)</h2>
       <form id="uploadLogoForm">
-        <label>Pilih file logo:</label>
+        <label>Pilih file logo (akan disimpan sebagai logo/logo.png):</label>
         <input type="file" id="logoFile" accept="image/*" required>
         <button type="submit">Upload Logo</button>
       </form>
       <div id="uploadLogoStatus" class="status"></div>
     </div>
     
-    <!-- 3. Upload Foto/Video ke Folder Images -->
+    <!-- 3. Upload Media (Foto/Video) ke Folder Images -->
     <div class="section">
-      <h2>Upload Foto/Video ke Repo Darkhorn</h2>
+      <h2>Upload Media (Foto/Video)</h2>
       <form id="uploadMediaForm">
         <label>Pilih file (foto/video):</label>
         <input type="file" id="mediaFile" accept="image/*,video/*" required>
@@ -77,20 +90,20 @@
       <div id="uploadMediaStatus" class="status"></div>
     </div>
     
-    <!-- 4. Edit Member List -->
+    <!-- 4. Edit Member List (member_list.txt) -->
     <div class="section">
-      <h2>Edit Member List (member_list.txt)</h2>
+      <h2>Edit Member List</h2>
       <form id="editMemberForm">
-        <label>Tambahkan data member (teks akan ditambahkan):</label>
+        <label>Tambahkan data member (teks akan ditambahkan ke file):</label>
         <textarea id="memberText" rows="4" placeholder="Masukkan data member..."></textarea>
         <button type="submit">Simpan Perubahan</button>
       </form>
       <div id="memberStatus" class="status"></div>
     </div>
     
-    <!-- 5. Edit Video Links -->
+    <!-- 5. Edit Video Links (video_links.txt) -->
     <div class="section">
-      <h2>Edit Video Links (video_links.txt)</h2>
+      <h2>Edit Video Links</h2>
       <form id="editVideoForm">
         <label>Masukkan link video baru (satu per baris):</label>
         <textarea id="videoText" rows="4" placeholder="Masukkan link video..."></textarea>
@@ -99,9 +112,9 @@
       <div id="videoStatus" class="status"></div>
     </div>
     
-    <!-- 6. Edit Recruitment Link -->
+    <!-- 6. Edit Recruitment Link (recruitment.txt) -->
     <div class="section">
-      <h2>Set Recruitment Link (recruitment.txt)</h2>
+      <h2>Set Recruitment Link</h2>
       <form id="editRecruitmentForm">
         <label>Masukkan URL recruitment:</label>
         <input type="text" id="recruitmentInput" placeholder="Masukkan URL recruitment">
@@ -110,9 +123,9 @@
       <div id="recruitmentStatus" class="status"></div>
     </div>
     
-    <!-- 7. Upload Minecraft Skin & Edit Skin List -->
+    <!-- 7. Upload Minecraft Skin & Edit Skin List (skins_list.txt) -->
     <div class="section">
-      <h2>Upload Minecraft Skin & Edit Skin List</h2>
+      <h2>Upload Minecraft Skin & Update Skin Mapping</h2>
       <form id="uploadSkinForm">
         <label>Pilih file skin Minecraft:</label>
         <input type="file" id="skinFile" accept="image/*" required>
@@ -136,6 +149,7 @@
     }
     updateTokenStatus();
     
+    // Simpan token
     document.getElementById("tokenForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const tokenInput = document.getElementById("tokenInput").value.trim();
@@ -147,14 +161,11 @@
       }
     });
     
-    // Fungsi bantu: membaca file dan mengubah ke Base64
+    // Fungsi bantu: baca file sebagai Base64
     function readFileAsBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => {
-          const base64String = reader.result.split(",")[1];
-          resolve(base64String);
-        };
+        reader.onload = () => resolve(reader.result.split(",")[1]);
         reader.onerror = error => reject(error);
         reader.readAsDataURL(file);
       });
@@ -170,7 +181,7 @@
         const content = await readFileAsBase64(file);
         const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/${path}`;
         let sha = null;
-        let getResponse = await fetch(url, {
+        const getResponse = await fetch(url, {
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
             "Accept": "application/vnd.github.v3+json"
@@ -207,39 +218,98 @@
       }
     }
     
-    // 2. Upload Logo
+    // 2. Upload Logo (disimpan sebagai logo/logo.png)
     document.getElementById("uploadLogoForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const fileInput = document.getElementById("logoFile");
-      const file = fileInput.files[0];
+      const file = document.getElementById("logoFile").files[0];
       const statusDiv = document.getElementById("uploadLogoStatus");
       if(file) {
         statusDiv.textContent = "Uploading logo...";
-        // Simpan logo di folder "logo" dengan nama tetap (logo.png) agar mudah diambil
         const path = "logo/logo.png";
         const success = await uploadFileToGitHub(REPO, path, file, "Upload logo " + file.name);
         statusDiv.textContent = success ? "Logo berhasil diupload." : "Gagal upload logo.";
-        fileInput.value = "";
+        document.getElementById("logoFile").value = "";
       }
     });
     
-    // 3. Upload Media (Foto/Video)
+    // 3. Upload Media (Foto/Video) ke folder images/
     document.getElementById("uploadMediaForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const fileInput = document.getElementById("mediaFile");
-      const file = fileInput.files[0];
+      const file = document.getElementById("mediaFile").files[0];
       const statusDiv = document.getElementById("uploadMediaStatus");
       if(file) {
         statusDiv.textContent = "Uploading media...";
-        // Simpan file di folder "images/" dengan nama asli
         const path = "images/" + file.name;
         const success = await uploadFileToGitHub(REPO, path, file, "Upload media " + file.name);
         statusDiv.textContent = success ? "Media berhasil diupload." : "Gagal upload media.";
-        fileInput.value = "";
+        document.getElementById("mediaFile").value = "";
       }
     });
     
-    // Fungsi bantu untuk update file teks (untuk member_list.txt, video_links.txt, recruitment.txt)
+    // 4. Edit Member List (tambahkan data ke member_list.txt)
+    document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newText = document.getElementById("memberText").value;
+      const statusDiv = document.getElementById("memberStatus");
+      if(newText.trim() === "") {
+        statusDiv.textContent = "Teks tidak boleh kosong.";
+        return;
+      }
+      await updateTextFile("member_list.txt", newText, statusDiv);
+      document.getElementById("memberText").value = "";
+    });
+    
+    // 5. Edit Video Links (video_links.txt)
+    document.getElementById("editVideoForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newText = document.getElementById("videoText").value;
+      const statusDiv = document.getElementById("videoStatus");
+      if(newText.trim() === "") {
+        statusDiv.textContent = "Teks tidak boleh kosong.";
+        return;
+      }
+      await updateTextFile("video_links.txt", newText, statusDiv);
+      document.getElementById("videoText").value = "";
+    });
+    
+    // 6. Edit Recruitment Link (recruitment.txt)
+    document.getElementById("editRecruitmentForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const newLink = document.getElementById("recruitmentInput").value;
+      const statusDiv = document.getElementById("recruitmentStatus");
+      if(newLink.trim() === "") {
+        statusDiv.textContent = "Link tidak boleh kosong.";
+        return;
+      }
+      await updateTextFile("recruitment.txt", newLink, statusDiv);
+      document.getElementById("recruitmentInput").value = "";
+    });
+    
+    // 7. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt)
+    document.getElementById("uploadSkinForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const file = document.getElementById("skinFile").files[0];
+      const playerName = document.getElementById("skinPlayer").value.trim();
+      const statusDiv = document.getElementById("skinStatus");
+      if(!file || playerName === "") {
+        statusDiv.textContent = "File dan nama player harus diisi.";
+        return;
+      }
+      statusDiv.textContent = "Uploading skin...";
+      // Simpan skin di folder "skins/" dengan nama: [playerName]_[namaFile]
+      const path = "skins/" + playerName + "_" + file.name;
+      const success = await uploadFileToGitHub(REPO, path, file, "Upload skin " + file.name);
+      if(success) {
+        // Update mapping di file skins_list.txt (format: playerName:URL_skin)
+        await updateTextFile("skins_list.txt", `${playerName}:${path}`, statusDiv);
+      } else {
+        statusDiv.textContent = "Gagal upload skin.";
+      }
+      document.getElementById("skinFile").value = "";
+      document.getElementById("skinPlayer").value = "";
+    });
+    
+    // Fungsi untuk update file teks di GitHub
     async function updateTextFile(filePath, newText, statusElement) {
       if(!GITHUB_TOKEN) {
         statusElement.textContent = "Token GitHub belum diset!";
@@ -250,7 +320,7 @@
       let existingContent = "";
       statusElement.textContent = "Mengambil konten file...";
       try {
-        let getResponse = await fetch(url, {
+        const getResponse = await fetch(url, {
           headers: {
             "Authorization": "token " + GITHUB_TOKEN,
             "Accept": "application/vnd.github.v3+json"
@@ -261,7 +331,7 @@
           sha = data.sha;
           existingContent = atob(data.content);
         }
-        // Gabungkan teks baru dengan konten yang ada (atau ganti seluruhnya sesuai kebutuhan)
+        // Gabungkan teks baru dengan konten yang ada (dengan pemisah baris)
         const updatedContent = existingContent + "\n" + newText;
         const payload = {
           message: "Update " + filePath,
@@ -290,70 +360,6 @@
         statusElement.textContent = "Error: " + error.message;
       }
     }
-    
-    // 4. Edit Member List
-    document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newData = document.getElementById("memberText").value;
-      const statusDiv = document.getElementById("memberStatus");
-      if(newData.trim() === "") {
-        statusDiv.textContent = "Teks tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("member_list.txt", newData, statusDiv);
-      document.getElementById("memberText").value = "";
-    });
-    
-    // 5. Edit Video Links
-    document.getElementById("editVideoForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newData = document.getElementById("videoText").value;
-      const statusDiv = document.getElementById("videoStatus");
-      if(newData.trim() === "") {
-        statusDiv.textContent = "Teks tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("video_links.txt", newData, statusDiv);
-      document.getElementById("videoText").value = "";
-    });
-    
-    // 6. Edit Recruitment Link
-    document.getElementById("editRecruitmentForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const newLink = document.getElementById("recruitmentInput").value;
-      const statusDiv = document.getElementById("recruitmentStatus");
-      if(newLink.trim() === "") {
-        statusDiv.textContent = "Link tidak boleh kosong.";
-        return;
-      }
-      await updateTextFile("recruitment.txt", newLink, statusDiv);
-      document.getElementById("recruitmentInput").value = "";
-    });
-    
-    // 7. Upload Minecraft Skin & Edit Skin List
-    document.getElementById("uploadSkinForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const fileInput = document.getElementById("skinFile");
-      const file = fileInput.files[0];
-      const playerName = document.getElementById("skinPlayer").value.trim();
-      const statusDiv = document.getElementById("skinStatus");
-      if(!file || playerName === "") {
-        statusDiv.textContent = "File dan nama player harus diisi.";
-        return;
-      }
-      statusDiv.textContent = "Uploading skin...";
-      // Simpan skin di folder "skins/" dengan nama file = nama player + ekstensi
-      const path = "skins/" + playerName + "_" + file.name;
-      const success = await uploadFileToGitHub(REPO, path, file, "Upload skin " + file.name);
-      if(success) {
-        // Update file skins_list.txt untuk mapping player ke skin (append data)
-        await updateTextFile("skins_list.txt", `${playerName}:${path}`, statusDiv);
-      } else {
-        statusDiv.textContent = "Gagal upload skin.";
-      }
-      fileInput.value = "";
-      document.getElementById("skinPlayer").value = "";
-    });
   </script>
 </body>
 </html>
