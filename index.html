@@ -79,7 +79,29 @@
       <div id="uploadLogoStatus" class="status"></div>
     </div>
     
-    <!-- 3. Upload Media (Foto/Video) ke Folder Images -->
+    <!-- 3. Upload Banner -->
+    <div class="section">
+      <h2>Upload Banner</h2>
+      <form id="uploadBannerForm">
+        <label>Pilih file banner (akan disimpan sebagai banner/banner.png):</label>
+        <input type="file" id="bannerFile" accept="image/*" required>
+        <button type="submit">Upload Banner</button>
+      </form>
+      <div id="uploadBannerStatus" class="status"></div>
+    </div>
+    
+    <!-- 4. Upload Background -->
+    <div class="section">
+      <h2>Upload Background</h2>
+      <form id="uploadBackgroundForm">
+        <label>Pilih file background (akan disimpan sebagai background/background.png):</label>
+        <input type="file" id="backgroundFile" accept="image/*" required>
+        <button type="submit">Upload Background</button>
+      </form>
+      <div id="uploadBackgroundStatus" class="status"></div>
+    </div>
+    
+    <!-- 5. Upload Media (Foto/Video) ke folder images/ -->
     <div class="section">
       <h2>Upload Media (Foto/Video)</h2>
       <form id="uploadMediaForm">
@@ -90,7 +112,7 @@
       <div id="uploadMediaStatus" class="status"></div>
     </div>
     
-    <!-- 4. Edit Member List (member_list.txt) -->
+    <!-- 6. Edit Member List (member_list.txt) -->
     <div class="section">
       <h2>Edit Member List</h2>
       <form id="editMemberForm">
@@ -101,7 +123,7 @@
       <div id="memberStatus" class="status"></div>
     </div>
     
-    <!-- 5. Edit Video Links (video_links.txt) -->
+    <!-- 7. Edit Video Links (video_links.txt) -->
     <div class="section">
       <h2>Edit Video Links</h2>
       <form id="editVideoForm">
@@ -112,7 +134,7 @@
       <div id="videoStatus" class="status"></div>
     </div>
     
-    <!-- 6. Edit Recruitment Link (recruitment.txt) -->
+    <!-- 8. Edit Recruitment Link (recruitment.txt) -->
     <div class="section">
       <h2>Set Recruitment Link</h2>
       <form id="editRecruitmentForm">
@@ -123,7 +145,7 @@
       <div id="recruitmentStatus" class="status"></div>
     </div>
     
-    <!-- 7. Upload Minecraft Skin & Edit Skin List (skins_list.txt) -->
+    <!-- 9. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt) -->
     <div class="section">
       <h2>Upload Minecraft Skin & Update Skin Mapping</h2>
       <form id="uploadSkinForm">
@@ -138,7 +160,7 @@
   </div>
   
   <script>
-    // Global Variabel
+    // Global variabel
     let GITHUB_TOKEN = localStorage.getItem("GITHUB_TOKEN") || "";
     const OWNER = "ScarilyId";
     const REPO = "Darkhorn";
@@ -232,7 +254,35 @@
       }
     });
     
-    // 3. Upload Media (Foto/Video) ke folder images/
+    // 3. Upload Banner (disimpan sebagai banner/banner.png)
+    document.getElementById("uploadBannerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const file = document.getElementById("bannerFile").files[0];
+      const statusDiv = document.getElementById("uploadBannerStatus");
+      if(file) {
+        statusDiv.textContent = "Uploading banner...";
+        const path = "banner/banner.png";
+        const success = await uploadFileToGitHub(REPO, path, file, "Upload banner " + file.name);
+        statusDiv.textContent = success ? "Banner berhasil diupload." : "Gagal upload banner.";
+        document.getElementById("bannerFile").value = "";
+      }
+    });
+    
+    // 4. Upload Background (disimpan sebagai background/background.png)
+    document.getElementById("uploadBackgroundForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const file = document.getElementById("backgroundFile").files[0];
+      const statusDiv = document.getElementById("uploadBackgroundStatus");
+      if(file) {
+        statusDiv.textContent = "Uploading background...";
+        const path = "background/background.png";
+        const success = await uploadFileToGitHub(REPO, path, file, "Upload background " + file.name);
+        statusDiv.textContent = success ? "Background berhasil diupload." : "Gagal upload background.";
+        document.getElementById("backgroundFile").value = "";
+      }
+    });
+    
+    // 5. Upload Media (Foto/Video) ke folder images/
     document.getElementById("uploadMediaForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const file = document.getElementById("mediaFile").files[0];
@@ -246,7 +296,7 @@
       }
     });
     
-    // 4. Edit Member List (tambahkan data ke member_list.txt)
+    // 6. Edit Member List (member_list.txt)
     document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const newText = document.getElementById("memberText").value;
@@ -259,7 +309,7 @@
       document.getElementById("memberText").value = "";
     });
     
-    // 5. Edit Video Links (video_links.txt)
+    // 7. Edit Video Links (video_links.txt)
     document.getElementById("editVideoForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const newText = document.getElementById("videoText").value;
@@ -272,7 +322,7 @@
       document.getElementById("videoText").value = "";
     });
     
-    // 6. Edit Recruitment Link (recruitment.txt)
+    // 8. Edit Recruitment Link (recruitment.txt)
     document.getElementById("editRecruitmentForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const newLink = document.getElementById("recruitmentInput").value;
@@ -285,7 +335,7 @@
       document.getElementById("recruitmentInput").value = "";
     });
     
-    // 7. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt)
+    // 9. Upload Minecraft Skin & Update Skin Mapping (skins_list.txt)
     document.getElementById("uploadSkinForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const file = document.getElementById("skinFile").files[0];
@@ -296,11 +346,9 @@
         return;
       }
       statusDiv.textContent = "Uploading skin...";
-      // Simpan skin di folder "skins/" dengan nama: [playerName]_[namaFile]
       const path = "skins/" + playerName + "_" + file.name;
       const success = await uploadFileToGitHub(REPO, path, file, "Upload skin " + file.name);
       if(success) {
-        // Update mapping di file skins_list.txt (format: playerName:URL_skin)
         await updateTextFile("skins_list.txt", `${playerName}:${path}`, statusDiv);
       } else {
         statusDiv.textContent = "Gagal upload skin.";
@@ -331,7 +379,6 @@
           sha = data.sha;
           existingContent = atob(data.content);
         }
-        // Gabungkan teks baru dengan konten yang ada (dengan pemisah baris)
         const updatedContent = existingContent + "\n" + newText;
         const payload = {
           message: "Update " + filePath,
